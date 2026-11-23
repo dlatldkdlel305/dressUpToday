@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #f3f9ff;
+    color: #0f2942;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@keyframes gentle-nudge {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+.animate-nudge {
+  animation: gentle-nudge 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-nudge {
+    animation: none;
+  }
+}

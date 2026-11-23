@@ -1,0 +1,2467 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>오늘 착장 — 나에 대해</title>
+    <meta
+      name="description"
+      content="연령대, 성별, 선호하는 옷 스타일을 선택하는 오늘 착장 첫 화면입니다."
+    />
+    <meta property="og:title" content="오늘 착장 — 나에 대해" />
+    <meta
+      property="og:description"
+      content="연령대, 성별, 선호하는 옷 스타일을 선택하는 오늘 착장 첫 화면입니다."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS v4 Browser CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @layer base {
+        html {
+          font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+          -webkit-tap-highlight-color: transparent;
+          scroll-behavior: smooth;
+        }
+
+        body {
+          background-color: #f3f9ff;
+          color: #0f2942;
+          line-height: 1.5;
+          -webkit-font-smoothing: antialiased;
+        }
+      }
+    </style>
+    <style>
+      @keyframes gentle-nudge {
+        0%, 100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-4px);
+        }
+        40% {
+          transform: translateX(4px);
+        }
+        60% {
+          transform: translateX(-3px);
+        }
+        80% {
+          transform: translateX(3px);
+        }
+      }
+
+      .animate-nudge {
+        animation: gentle-nudge 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        .animate-nudge {
+          animation: none;
+        }
+      }
+    </style>
+
+    <!-- React 18 UMD & Babel Standalone (works on file:// and GitHub Pages) -->
+    <script
+      crossorigin
+      src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.26.10/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-presets="react">
+      const {useCallback, useEffect, useMemo, useRef, useState} = React;
+
+      // =========================================================================
+      // Lucide Icons (Inline SVG equivalents)
+      // =========================================================================
+      function LucideIcon({children, className = '', ...props}) {
+        return (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+            {...props}
+          >
+            {children}
+          </svg>
+        );
+      }
+
+      function Check(props) {
+        return (
+          <LucideIcon {...props}>
+            <path d="M20 6 9 17l-5-5" />
+          </LucideIcon>
+        );
+      }
+
+      function ChevronRight(props) {
+        return (
+          <LucideIcon {...props}>
+            <path d="m9 18 6-6-6-6" />
+          </LucideIcon>
+        );
+      }
+
+      function ChevronLeft(props) {
+        return (
+          <LucideIcon {...props}>
+            <path d="m15 18-6-6 6-6" />
+          </LucideIcon>
+        );
+      }
+
+      function Loader2(props) {
+        return (
+          <LucideIcon {...props}>
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          </LucideIcon>
+        );
+      }
+
+      function LocateFixed(props) {
+        return (
+          <LucideIcon {...props}>
+            <line x1="2" x2="5" y1="12" y2="12" />
+            <line x1="19" x2="22" y1="12" y2="12" />
+            <line x1="12" x2="12" y1="2" y2="5" />
+            <line x1="12" x2="12" y1="19" y2="22" />
+            <circle cx="12" cy="12" r="7" />
+            <circle cx="12" cy="12" r="3" />
+          </LucideIcon>
+        );
+      }
+
+      function MapPin(props) {
+        return (
+          <LucideIcon {...props}>
+            <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+            <circle cx="12" cy="10" r="3" />
+          </LucideIcon>
+        );
+      }
+
+      function Search(props) {
+        return (
+          <LucideIcon {...props}>
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </LucideIcon>
+        );
+      }
+
+      function X(props) {
+        return (
+          <LucideIcon {...props}>
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </LucideIcon>
+        );
+      }
+
+      function Home(props) {
+        return (
+          <LucideIcon {...props}>
+            <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+            <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          </LucideIcon>
+        );
+      }
+
+      function RefreshCw(props) {
+        return (
+          <LucideIcon {...props}>
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+            <path d="M21 3v5h-5" />
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+            <path d="M8 16H3v5" />
+          </LucideIcon>
+        );
+      }
+
+      // =========================================================================
+      // Korea Regions Data (src/data/koreaRegions.ts)
+      // =========================================================================
+      const CITIES = [
+        {id: 'seoul', name: '서울', fullName: '서울특별시', subUnitLabel: '동'},
+        {id: 'suwon', name: '수원', fullName: '경기도 수원시', subUnitLabel: '구'},
+        {id: 'incheon', name: '인천', fullName: '인천광역시', subUnitLabel: '군·구'},
+        {id: 'daejeon', name: '대전', fullName: '대전광역시', subUnitLabel: '구'},
+        {id: 'daegu', name: '대구', fullName: '대구광역시', subUnitLabel: '군·구'},
+        {id: 'gwangju', name: '광주', fullName: '광주광역시', subUnitLabel: '구'},
+        {id: 'busan', name: '부산', fullName: '부산광역시', subUnitLabel: '군·구'},
+        {id: 'jeju', name: '제주', fullName: '제주특별자치도', subUnitLabel: '지역'},
+      ];
+
+      const SEOUL_DISTRICTS = [
+        '강남구',
+        '강동구',
+        '강북구',
+        '강서구',
+        '관악구',
+        '광진구',
+        '구로구',
+        '금천구',
+        '노원구',
+        '도봉구',
+        '동대문구',
+        '동작구',
+        '마포구',
+        '서대문구',
+        '서초구',
+        '성동구',
+        '성북구',
+        '송파구',
+        '양천구',
+        '영등포구',
+        '용산구',
+        '은평구',
+        '종로구',
+        '중구',
+        '중랑구',
+      ];
+
+      const SEOUL_DONGS = [
+        // 강남구
+        {id: 'seoul-gangnam-yeoksam', name: '역삼동', district: '강남구', lat: 37.5007, lon: 127.0365},
+        {id: 'seoul-gangnam-samseong', name: '삼성동', district: '강남구', lat: 37.514, lon: 127.0565},
+        {id: 'seoul-gangnam-daechi', name: '대치동', district: '강남구', lat: 37.4995, lon: 127.0625},
+        {id: 'seoul-gangnam-apgujeong', name: '압구정동', district: '강남구', lat: 37.5271, lon: 127.0285},
+        {id: 'seoul-gangnam-cheongdam', name: '청담동', district: '강남구', lat: 37.5236, lon: 127.0485},
+        {id: 'seoul-gangnam-gaepo', name: '개포동', district: '강남구', lat: 37.4822, lon: 127.0662},
+        {id: 'seoul-gangnam-suseo', name: '수서동', district: '강남구', lat: 37.4875, lon: 127.1014},
+
+        // 강동구
+        {id: 'seoul-gangdong-cheonho', name: '천호동', district: '강동구', lat: 37.5405, lon: 127.1257},
+        {id: 'seoul-gangdong-gil', name: '길동', district: '강동구', lat: 37.5376, lon: 127.1404},
+        {id: 'seoul-gangdong-myeongil', name: '명일동', district: '강동구', lat: 37.5514, lon: 127.1445},
+        {id: 'seoul-gangdong-amsa', name: '암사동', district: '강동구', lat: 37.5512, lon: 127.1279},
+        {id: 'seoul-gangdong-godeok', name: '고덕동', district: '강동구', lat: 37.5563, lon: 127.1553},
+
+        // 강북구
+        {id: 'seoul-gangbuk-mia', name: '미아동', district: '강북구', lat: 37.6263, lon: 127.026},
+        {id: 'seoul-gangbuk-suyu', name: '수유동', district: '강북구', lat: 37.6382, lon: 127.0218},
+        {id: 'seoul-gangbuk-beon', name: '번동', district: '강북구', lat: 37.632, lon: 127.0394},
+        {id: 'seoul-gangbuk-ui', name: '우이동', district: '강북구', lat: 37.6584, lon: 127.0079},
+
+        // 강서구
+        {id: 'seoul-gangseo-hwagok', name: '화곡동', district: '강서구', lat: 37.5416, lon: 126.8404},
+        {id: 'seoul-gangseo-magok', name: '마곡동', district: '강서구', lat: 37.5602, lon: 126.8255},
+        {id: 'seoul-gangseo-gayang', name: '가양동', district: '강서구', lat: 37.565, lon: 126.8548},
+        {id: 'seoul-gangseo-deungchon', name: '등촌동', district: '강서구', lat: 37.5522, lon: 126.8588},
+        {id: 'seoul-gangseo-banghwa', name: '방화동', district: '강서구', lat: 37.5734, lon: 126.8141},
+
+        // 관악구
+        {id: 'seoul-gwanak-sillim', name: '신림동', district: '관악구', lat: 37.4842, lon: 126.9296},
+        {id: 'seoul-gwanak-bongcheon', name: '봉천동', district: '관악구', lat: 37.4823, lon: 126.9516},
+        {id: 'seoul-gwanak-nakseongdae', name: '낙성대동', district: '관악구', lat: 37.4763, lon: 126.9608},
+        {id: 'seoul-gwanak-namhyeon', name: '남현동', district: '관악구', lat: 37.4744, lon: 126.9794},
+
+        // 광진구
+        {id: 'seoul-gwangjin-jayang', name: '자양동', district: '광진구', lat: 37.5342, lon: 127.0752},
+        {id: 'seoul-gwangjin-guui', name: '구의동', district: '광진구', lat: 37.5382, lon: 127.0879},
+        {id: 'seoul-gwangjin-hwayang', name: '화양동', district: '광진구', lat: 37.5425, lon: 127.0715},
+        {id: 'seoul-gwangjin-gwangjang', name: '광장동', district: '광진구', lat: 37.5469, lon: 127.1035},
+
+        // 구로구
+        {id: 'seoul-guro-guro', name: '구로동', district: '구로구', lat: 37.4954, lon: 126.8877},
+        {id: 'seoul-guro-sindorim', name: '신도림동', district: '구로구', lat: 37.5088, lon: 126.8884},
+        {id: 'seoul-guro-gaebong', name: '개봉동', district: '구로구', lat: 37.4926, lon: 126.8588},
+        {id: 'seoul-guro-oryu', name: '오류동', district: '구로구', lat: 37.4945, lon: 126.8453},
+
+        // 금천구
+        {id: 'seoul-geumcheon-gasan', name: '가산동', district: '금천구', lat: 37.4785, lon: 126.8819},
+        {id: 'seoul-geumcheon-doksan', name: '독산동', district: '금천구', lat: 37.4694, lon: 126.8981},
+        {id: 'seoul-geumcheon-siheung', name: '시흥동', district: '금천구', lat: 37.4519, lon: 126.9035},
+
+        // 노원구
+        {id: 'seoul-nowon-sanggye', name: '상계동', district: '노원구', lat: 37.6579, lon: 127.0672},
+        {id: 'seoul-nowon-junggye', name: '중계동', district: '노원구', lat: 37.6462, lon: 127.0714},
+        {id: 'seoul-nowon-hagye', name: '하계동', district: '노원구', lat: 37.6365, lon: 127.0705},
+        {id: 'seoul-nowon-gongneung', name: '공릉동', district: '노원구', lat: 37.6258, lon: 127.0772},
+
+        // 도봉구
+        {id: 'seoul-dobong-chang', name: '창동', district: '도봉구', lat: 37.6531, lon: 127.0478},
+        {id: 'seoul-dobong-ssangmun', name: '쌍문동', district: '도봉구', lat: 37.6487, lon: 127.0347},
+        {id: 'seoul-dobong-banghak', name: '방학동', district: '도봉구', lat: 37.6675, lon: 127.0419},
+        {id: 'seoul-dobong-dobong', name: '도봉동', district: '도봉구', lat: 37.6819, lon: 127.0468},
+
+        // 동대문구
+        {id: 'seoul-ddm-cheongnyangni', name: '청량리동', district: '동대문구', lat: 37.5819, lon: 127.0479},
+        {id: 'seoul-ddm-hoegi', name: '회기동', district: '동대문구', lat: 37.5906, lon: 127.0549},
+        {id: 'seoul-ddm-jegi', name: '제기동', district: '동대문구', lat: 37.5782, lon: 127.0377},
+        {id: 'seoul-ddm-jangan', name: '장안동', district: '동대문구', lat: 37.5681, lon: 127.0695},
+        {id: 'seoul-ddm-dapsimni', name: '답십리동', district: '동대문구', lat: 37.5688, lon: 127.0545},
+
+        // 동작구
+        {id: 'seoul-dongjak-noryangjin', name: '노량진동', district: '동작구', lat: 37.5133, lon: 126.9423},
+        {id: 'seoul-dongjak-sadang', name: '사당동', district: '동작구', lat: 37.4827, lon: 126.9766},
+        {id: 'seoul-dongjak-sangdo', name: '상도동', district: '동작구', lat: 37.5025, lon: 126.9478},
+        {id: 'seoul-dongjak-heukseok', name: '흑석동', district: '동작구', lat: 37.5082, lon: 126.9628},
+
+        // 마포구
+        {id: 'seoul-mapo-seogyo', name: '서교동', district: '마포구', lat: 37.5553, lon: 126.9225},
+        {id: 'seoul-mapo-yeonnam', name: '연남동', district: '마포구', lat: 37.5637, lon: 126.9249},
+        {id: 'seoul-mapo-mangwon', name: '망원동', district: '마포구', lat: 37.5565, lon: 126.9061},
+        {id: 'seoul-mapo-gongdeok', name: '공덕동', district: '마포구', lat: 37.5453, lon: 126.9539},
+        {id: 'seoul-mapo-sangam', name: '상암동', district: '마포구', lat: 37.5791, lon: 126.8891},
+
+        // 서대문구
+        {id: 'seoul-sdm-sinchon', name: '신촌동', district: '서대문구', lat: 37.5597, lon: 126.9422},
+        {id: 'seoul-sdm-yeonhui', name: '연희동', district: '서대문구', lat: 37.5681, lon: 126.9328},
+        {id: 'seoul-sdm-hongje', name: '홍제동', district: '서대문구', lat: 37.5882, lon: 126.9441},
+        {id: 'seoul-sdm-bukahyeon', name: '북아현동', district: '서대문구', lat: 37.5608, lon: 126.9565},
+
+        // 서초구
+        {id: 'seoul-seocho-seocho', name: '서초동', district: '서초구', lat: 37.4918, lon: 127.0135},
+        {id: 'seoul-seocho-banpo', name: '반포동', district: '서초구', lat: 37.5042, lon: 127.0012},
+        {id: 'seoul-seocho-bangbae', name: '방배동', district: '서초구', lat: 37.4812, lon: 126.9937},
+        {id: 'seoul-seocho-yangjae', name: '양재동', district: '서초구', lat: 37.4796, lon: 127.0391},
+        {id: 'seoul-seocho-jamwon', name: '잠원동', district: '서초구', lat: 37.5152, lon: 127.0156},
+
+        // 성동구
+        {id: 'seoul-seongdong-seongsu', name: '성수동', district: '성동구', lat: 37.5446, lon: 127.0559},
+        {id: 'seoul-seongdong-wangsimni', name: '왕십리동', district: '성동구', lat: 37.5612, lon: 127.0376},
+        {id: 'seoul-seongdong-oksu', name: '옥수동', district: '성동구', lat: 37.5413, lon: 127.0176},
+        {id: 'seoul-seongdong-geumho', name: '금호동', district: '성동구', lat: 37.5491, lon: 127.0209},
+
+        // 성북구
+        {id: 'seoul-seongbuk-gireum', name: '길음동', district: '성북구', lat: 37.6033, lon: 127.0247},
+        {id: 'seoul-seongbuk-anam', name: '안암동', district: '성북구', lat: 37.5861, lon: 127.0294},
+        {id: 'seoul-seongbuk-jeongneung', name: '정릉동', district: '성북구', lat: 37.6064, lon: 127.0102},
+        {id: 'seoul-seongbuk-seongbuk', name: '성북동', district: '성북구', lat: 37.5934, lon: 126.9994},
+
+        // 송파구
+        {id: 'seoul-songpa-jamsil', name: '잠실동', district: '송파구', lat: 37.5133, lon: 127.0875},
+        {id: 'seoul-songpa-garak', name: '가락동', district: '송파구', lat: 37.4959, lon: 127.1223},
+        {id: 'seoul-songpa-munjeong', name: '문정동', district: '송파구', lat: 37.4864, lon: 127.1261},
+        {id: 'seoul-songpa-bangi', name: '방이동', district: '송파구', lat: 37.515, lon: 127.1194},
+        {id: 'seoul-songpa-ogeum', name: '오금동', district: '송파구', lat: 37.5023, lon: 127.1319},
+
+        // 양천구
+        {id: 'seoul-yangcheon-mok', name: '목동', district: '양천구', lat: 37.5305, lon: 126.8752},
+        {id: 'seoul-yangcheon-sinjeong', name: '신정동', district: '양천구', lat: 37.5194, lon: 126.8576},
+        {id: 'seoul-yangcheon-sinwol', name: '신월동', district: '양천구', lat: 37.5218, lon: 126.8325},
+
+        // 영등포구
+        {id: 'seoul-ydp-yeouido', name: '여의도동', district: '영등포구', lat: 37.526, lon: 126.9242},
+        {id: 'seoul-ydp-yeongdeungpo', name: '영등포동', district: '영등포구', lat: 37.5177, lon: 126.9062},
+        {id: 'seoul-ydp-dangsan', name: '당산동', district: '영등포구', lat: 37.5313, lon: 126.9016},
+        {id: 'seoul-ydp-mullae', name: '문래동', district: '영등포구', lat: 37.5173, lon: 126.8952},
+        {id: 'seoul-ydp-daerim', name: '대림동', district: '영등포구', lat: 37.4936, lon: 126.8979},
+
+        // 용산구
+        {id: 'seoul-yongsan-itaewon', name: '이태원동', district: '용산구', lat: 37.5345, lon: 126.9946},
+        {id: 'seoul-yongsan-hannam', name: '한남동', district: '용산구', lat: 37.5356, lon: 127.0046},
+        {id: 'seoul-yongsan-ichon', name: '이촌동', district: '용산구', lat: 37.5215, lon: 126.9721},
+        {id: 'seoul-yongsan-hangangno', name: '한강로동', district: '용산구', lat: 37.5301, lon: 126.9669},
+
+        // 은평구
+        {id: 'seoul-eunpyeong-bulgwang', name: '불광동', district: '은평구', lat: 37.6105, lon: 126.9299},
+        {id: 'seoul-eunpyeong-yeonseo', name: '연신내·갈현동', district: '은평구', lat: 37.619, lon: 126.9212},
+        {id: 'seoul-eunpyeong-eungam', name: '응암동', district: '은평구', lat: 37.5959, lon: 126.9182},
+        {id: 'seoul-eunpyeong-jingwan', name: '진관동', district: '은평구', lat: 37.6388, lon: 126.9228},
+
+        // 종로구
+        {id: 'seoul-jongno-jongno1', name: '종로1·2·3·4가동', district: '종로구', lat: 37.5715, lon: 126.9882},
+        {id: 'seoul-jongno-samcheong', name: '삼청동', district: '종로구', lat: 37.5861, lon: 126.9817},
+        {id: 'seoul-jongno-sajik', name: '사직동', district: '종로구', lat: 37.5762, lon: 126.9689},
+        {id: 'seoul-jongno-hyehwa', name: '혜화동', district: '종로구', lat: 37.5863, lon: 127.0005},
+        {id: 'seoul-jongno-pyeongchang', name: '평창동', district: '종로구', lat: 37.6131, lon: 126.9746},
+
+        // 중구
+        {id: 'seoul-jung-myeong', name: '명동', district: '중구', lat: 37.5601, lon: 126.9859},
+        {id: 'seoul-jung-euljiro', name: '을지로동', district: '중구', lat: 37.5665, lon: 126.9912},
+        {id: 'seoul-jung-sindang', name: '신당동', district: '중구', lat: 37.5637, lon: 127.0156},
+        {id: 'seoul-jung-sogong', name: '소공동', district: '중구', lat: 37.5639, lon: 126.9788},
+
+        // 중랑구
+        {id: 'seoul-jungnang-myeonmok', name: '면목동', district: '중랑구', lat: 37.5844, lon: 127.0879},
+        {id: 'seoul-jungnang-sangbong', name: '상봉동', district: '중랑구', lat: 37.5966, lon: 127.0861},
+        {id: 'seoul-jungnang-sinnae', name: '신내동', district: '중랑구', lat: 37.6095, lon: 127.0972},
+        {id: 'seoul-jungnang-muk', name: '묵동', district: '중랑구', lat: 37.6122, lon: 127.0785},
+      ];
+
+      const OTHER_CITY_SUBREGIONS = {
+        suwon: [
+          {id: 'suwon-jangan', name: '장안구', lat: 37.3037, lon: 127.0102},
+          {id: 'suwon-gwonseon', name: '권선구', lat: 37.2576, lon: 126.9718},
+          {id: 'suwon-paldal', name: '팔달구', lat: 37.2825, lon: 127.0201},
+          {id: 'suwon-yeongtong', name: '영통구', lat: 37.2596, lon: 127.0465},
+        ],
+        incheon: [
+          {id: 'incheon-jung', name: '중구', lat: 37.4737, lon: 126.6217},
+          {id: 'incheon-dong', name: '동구', lat: 37.4739, lon: 126.6432},
+          {id: 'incheon-michuhol', name: '미추홀구', lat: 37.4636, lon: 126.6502},
+          {id: 'incheon-yeonsu', name: '연수구', lat: 37.4102, lon: 126.6782},
+          {id: 'incheon-namdong', name: '남동구', lat: 37.4472, lon: 126.7311},
+          {id: 'incheon-bupyeong', name: '부평구', lat: 37.5074, lon: 126.7218},
+          {id: 'incheon-gyeyang', name: '계양구', lat: 37.5374, lon: 126.7376},
+          {id: 'incheon-seo', name: '서구', lat: 37.5455, lon: 126.6759},
+          {id: 'incheon-ganghwa', name: '강화군', lat: 37.7465, lon: 126.4881},
+          {id: 'incheon-ongjin', name: '옹진군', lat: 37.4466, lon: 126.6368},
+        ],
+        daejeon: [
+          {id: 'daejeon-dong', name: '동구', lat: 36.312, lon: 127.4549},
+          {id: 'daejeon-jung', name: '중구', lat: 36.3257, lon: 127.4212},
+          {id: 'daejeon-seo', name: '서구', lat: 36.3555, lon: 127.3838},
+          {id: 'daejeon-yuseong', name: '유성구', lat: 36.3622, lon: 127.3561},
+          {id: 'daejeon-daedeok', name: '대덕구', lat: 36.3466, lon: 127.4158},
+        ],
+        daegu: [
+          {id: 'daegu-jung', name: '중구', lat: 35.8693, lon: 128.6062},
+          {id: 'daegu-dong', name: '동구', lat: 35.8866, lon: 128.6356},
+          {id: 'daegu-seo', name: '서구', lat: 35.8718, lon: 128.5592},
+          {id: 'daegu-nam', name: '남구', lat: 35.846, lon: 128.5977},
+          {id: 'daegu-buk', name: '북구', lat: 35.8857, lon: 128.5829},
+          {id: 'daegu-suseong', name: '수성구', lat: 35.8581, lon: 128.6305},
+          {id: 'daegu-dalseo', name: '달서구', lat: 35.8299, lon: 128.5327},
+          {id: 'daegu-dalseong', name: '달성군', lat: 35.7745, lon: 128.4314},
+          {id: 'daegu-gunwi', name: '군위군', lat: 36.2427, lon: 128.5729},
+        ],
+        gwangju: [
+          {id: 'gwangju-dong', name: '동구', lat: 35.1461, lon: 126.9231},
+          {id: 'gwangju-seo', name: '서구', lat: 35.152, lon: 126.8895},
+          {id: 'gwangju-nam', name: '남구', lat: 35.1328, lon: 126.9025},
+          {id: 'gwangju-buk', name: '북구', lat: 35.1741, lon: 126.912},
+          {id: 'gwangju-gwangsan', name: '광산구', lat: 35.1396, lon: 126.7937},
+        ],
+        busan: [
+          {id: 'busan-jung', name: '중구', lat: 35.1062, lon: 129.0323},
+          {id: 'busan-seo', name: '서구', lat: 35.0979, lon: 129.0244},
+          {id: 'busan-dong', name: '동구', lat: 35.1293, lon: 129.0455},
+          {id: 'busan-yeongdo', name: '영도구', lat: 35.0912, lon: 129.0679},
+          {id: 'busan-busanjin', name: '부산진구', lat: 35.1631, lon: 129.0532},
+          {id: 'busan-dongnae', name: '동래구', lat: 35.2049, lon: 129.0837},
+          {id: 'busan-nam', name: '남구', lat: 35.1365, lon: 129.0843},
+          {id: 'busan-buk', name: '북구', lat: 35.1972, lon: 128.9903},
+          {id: 'busan-haeundae', name: '해운대구', lat: 35.1631, lon: 129.1636},
+          {id: 'busan-saha', name: '사하구', lat: 35.1045, lon: 128.9748},
+          {id: 'busan-geumjeong', name: '금정구', lat: 35.2429, lon: 129.0921},
+          {id: 'busan-gangseo', name: '강서구', lat: 35.2122, lon: 128.9806},
+          {id: 'busan-yeonje', name: '연제구', lat: 35.1763, lon: 129.0797},
+          {id: 'busan-suyeong', name: '수영구', lat: 35.1456, lon: 129.1132},
+          {id: 'busan-sasang', name: '사상구', lat: 35.1526, lon: 128.9912},
+          {id: 'busan-gijang', name: '기장군', lat: 35.2446, lon: 129.2223},
+        ],
+        jeju: [
+          {id: 'jeju-si', name: '제주시', lat: 33.4996, lon: 126.5312},
+          {id: 'jeju-seogwipo', name: '서귀포시', lat: 33.2541, lon: 126.5601},
+        ],
+      };
+
+      // =========================================================================
+      // Weather Service (src/services/weatherService.ts)
+      // =========================================================================
+      function mapWeatherCode(code) {
+        if (code === 0) {
+          return {label: '맑음', emoji: '☀️'};
+        }
+        if (code === 1 || code === 2) {
+          return {label: '구름 조금', emoji: '⛅'};
+        }
+        if (code === 3) {
+          return {label: '흐림', emoji: '☁️'};
+        }
+        if (code === 45 || code === 48) {
+          return {label: '안개', emoji: '🌫️'};
+        }
+        if (code === 51 || code === 53 || code === 55 || code === 56 || code === 57) {
+          return {label: '이슬비', emoji: '🌦️'};
+        }
+        if (
+          code === 61 ||
+          code === 63 ||
+          code === 65 ||
+          code === 66 ||
+          code === 67 ||
+          code === 80 ||
+          code === 81 ||
+          code === 82
+        ) {
+          return {label: '비', emoji: '🌧️'};
+        }
+        if (
+          code === 71 ||
+          code === 73 ||
+          code === 75 ||
+          code === 77 ||
+          code === 85 ||
+          code === 86
+        ) {
+          return {label: '눈', emoji: '❄️'};
+        }
+        if (code === 95 || code === 96 || code === 99) {
+          return {label: '천둥·번개', emoji: '⛈️'};
+        }
+        return {label: '흐림', emoji: '☁️'};
+      }
+
+      async function fetchOpenMeteoWeather(lat, lon, signal) {
+        const url = new URL('https://api.open-meteo.com/v1/forecast');
+        url.searchParams.set('latitude', lat.toFixed(4));
+        url.searchParams.set('longitude', lon.toFixed(4));
+        url.searchParams.set('current', 'temperature_2m,apparent_temperature,weather_code');
+        url.searchParams.set(
+          'daily',
+          'temperature_2m_max,temperature_2m_min,precipitation_probability_max',
+        );
+        url.searchParams.set('timezone', 'Asia/Seoul');
+        url.searchParams.set('forecast_days', '1');
+
+        const response = await fetch(url.toString(), {signal});
+        if (!response.ok) {
+          throw new Error('날씨 정보를 불러오지 못했어요.');
+        }
+
+        const data = await response.json();
+        const current = data && data.current;
+        const daily = data && data.daily;
+
+        if (!current || !daily) {
+          throw new Error('날씨 데이터 형식이 올바르지 않아요.');
+        }
+
+        const {label, emoji} = mapWeatherCode(Number(current.weather_code ?? 3));
+
+        return {
+          temperature: Math.round(Number(current.temperature_2m ?? 0)),
+          apparentTemperature: Math.round(Number(current.apparent_temperature ?? 0)),
+          weatherLabel: label,
+          weatherEmoji: emoji,
+          tempMin: Math.round(Number((daily.temperature_2m_min && daily.temperature_2m_min[0]) ?? 0)),
+          tempMax: Math.round(Number((daily.temperature_2m_max && daily.temperature_2m_max[0]) ?? 0)),
+          precipitationProbability: Math.round(
+            Number((daily.precipitation_probability_max && daily.precipitation_probability_max[0]) ?? 0),
+          ),
+        };
+      }
+
+      // =========================================================================
+      // Standalone Outfit Recommendation Fallback (for GitHub Pages / file://)
+      // =========================================================================
+      function buildLocalOutfitRecommendation({
+        age,
+        gender,
+        styleId,
+        weather,
+        variantIndex = 0,
+      }) {
+        const feelsLike = weather.apparentTemperature;
+        const tempDiff = Math.round(weather.tempMax - weather.tempMin);
+        const isRainy =
+          weather.precipitationProbability >= 40 ||
+          weather.weatherLabel === '비' ||
+          weather.weatherLabel === '이슬비' ||
+          weather.weatherLabel === '천둥·번개';
+        const isSnowy = weather.weatherLabel === '눈';
+        const isWideDiff = tempDiff >= 8;
+        const isSenior = age === '60대' || age === '70대 이상';
+        const pick = (arr) => arr[variantIndex % arr.length];
+
+        let band = 'mild';
+        if (feelsLike <= 4) band = 'freezing';
+        else if (feelsLike <= 11) band = 'chilly';
+        else if (feelsLike <= 16) band = 'cool';
+        else if (feelsLike <= 22) band = 'mild';
+        else if (feelsLike <= 27) band = 'warm';
+        else band = 'hot';
+
+        const presets = {
+          casual: {
+            freezing: [
+              {
+                outer: '가볍고 보온성 좋은 롱 패딩 또는 퀼팅 패딩 점퍼',
+                top: '부드러운 기모 맨투맨 안에 얇은 내복 껴입기',
+                bottom: '안감이 따뜻한 기모 데님 팬츠 또는 코듀로이 바지',
+                shoes: '발이 시리지 않은 방한 스니커즈나 어그 스타일 단화',
+                accessory: '포근한 니트 목도리와 장갑',
+              },
+              {
+                outer: '두툼한 숏 패딩 점퍼',
+                top: '포근한 울 혼방 니트 스웨터와 면 긴팔 티셔츠',
+                bottom: '여유 있는 핏의 두꺼운 면바지',
+                shoes: '바닥이 튼튼한 가죽 스니커즈와 두꺼운 양말',
+                accessory: '귀까지 덮는 부드러운 비니와 크로스백',
+              },
+            ],
+            chilly: [
+              {
+                outer: '가볍게 걸치기 좋은 퀼팅 재킷 또는 플리스 집업',
+                top: '면 100% 긴팔 맨투맨과 얇은 흰색 티셔츠 레이어드',
+                bottom: '편안한 스트레이트 핏 청바지',
+                shoes: '쿠션감 좋은 데일리 운동화',
+                accessory: '얇은 면 스카프와 가벼운 에코백',
+              },
+              {
+                outer: '바람을 막아주는 여유로운 야상 점퍼',
+                top: '부드러운 골지 니트 풀오버',
+                bottom: '신축성 좋은 면 치노 팬츠',
+                shoes: '발이 편한 캔버스 스니커즈',
+                accessory: '보온 텀블러를 담기 좋은 숄더백',
+              },
+            ],
+            cool: [
+              {
+                outer: '벗고 입기 편한 얇은 니트 카디건 또는 데님 재킷',
+                top: '산뜻한 긴팔 면 티셔츠',
+                bottom: '활동하기 편한 와이드 면바지 또는 연청바지',
+                shoes: '가벼운 런닝형 운동화',
+                accessory: '실용적인 캔버스 토트백',
+              },
+              {
+                outer: '가벼운 코튼 블루종 점퍼',
+                top: '단정한 스트라이프 긴팔 티셔츠',
+                bottom: '편안한 턱 밴딩 코튼 팬츠',
+                shoes: '쿠션감 있는 스니커즈',
+                accessory: '가벼운 크로스백',
+              },
+            ],
+            mild: [
+              {
+                outer: '아침저녁 바람을 막아줄 얇은 면 셔츠형 아우터',
+                top: '통기성 좋은 반팔 면 티셔츠',
+                bottom: '편안한 얇은 면바지 또는 청바지',
+                shoes: '가볍고 통풍이 잘되는 운동화',
+                accessory: '자외선 차단용 얇은 모자와 에코백',
+              },
+              {
+                outer: '휴대하기 좋은 얇은 루즈핏 카디건',
+                top: '깔끔한 무지 반팔 티셔츠',
+                bottom: '시원한 린넨 혼방 밴딩 팬츠',
+                shoes: '발이 가벼운 슬립온 스니커즈',
+                accessory: '가벼운 크로스백',
+              },
+            ],
+            warm: [
+              {
+                outer: '실내 냉방 대비용으로 챙기는 아주 얇은 린넨 셔츠',
+                top: '시원한 면 반팔 티셔츠',
+                bottom: '통풍이 잘되는 얇은 면바지 또는 7부 바지',
+                shoes: '가벼운 메쉬 운동화',
+                accessory: '햇빛을 가려줄 챙 넓은 모자',
+              },
+              {
+                outer: '가방에 쏙 들어가는 얇은 바람막이 겉옷',
+                top: '땀 흡수가 잘되는 넉넉한 반팔 티셔츠',
+                bottom: '가벼운 코튼 반바지 또는 얇은 와이드 팬츠',
+                shoes: '편안한 샌들이나 통풍 잘되는 스니커즈',
+                accessory: '선글라스와 가벼운 숄더백',
+              },
+            ],
+            hot: [
+              {
+                outer: '겉옷 없이 시원하게 입고, 실내 냉방용 얇은 가디건만 휴대',
+                top: '바람이 잘 통하는 린넨 반팔 셔츠',
+                bottom: '가볍고 헐렁한 냉감 소재 바지',
+                shoes: '발이 시원한 스트랩 샌들 또는 메쉬 운동화',
+                accessory: '햇볕을 막아줄 양산 겸용 우산과 손수건',
+              },
+              {
+                outer: '생략 (대신 자외선 차단용 아주 얇은 긴팔 셔츠 휴대)',
+                top: '시원한 쿨링 반팔 티셔츠',
+                bottom: '통기성 좋은 린넨 반바지 또는 얇은 통바지',
+                shoes: '발바닥이 편한 쿠션 샌들',
+                accessory: '통풍 잘되는 밀짚 모자와 생수 파우치',
+              },
+            ],
+          },
+          neat: {
+            freezing: [
+              {
+                outer: '단정하고 따뜻한 하프 기장의 모직 코트',
+                top: '목까지 포근한 터틀넥 니트와 얇은 내의',
+                bottom: '보온 안감이 들어간 차콜 색상 모직 슬랙스',
+                shoes: '굽이 낮고 안정적인 가죽 단화',
+                accessory: '단정한 캐시미어 머플러와 가죽 토트백',
+              },
+              {
+                outer: '깔끔한 누빔 안감의 롱 코트',
+                top: '부드러운 울 카디건 안에 면 셔츠 겹쳐 입기',
+                bottom: '여유 있는 핏의 따뜻한 기모 정장 바지',
+                shoes: '발이 편한 가죽 로퍼와 두꺼운 양말',
+                accessory: '목이 따뜻한 울 스카프와 손장갑',
+              },
+            ],
+            chilly: [
+              {
+                outer: '깔끔하게 떨어지는 미디 기장의 트렌치코트 또는 얇은 코트',
+                top: '단정한 라운드넥 울 니트',
+                bottom: '구김이 적은 네이비 슬랙스',
+                shoes: '발이 편안한 낮은 굽 가죽 로퍼',
+                accessory: '단정한 스카프와 가죽 숄더백',
+              },
+              {
+                outer: '품이 여유로운 누빔 셔츠형 재킷',
+                top: '깨끗한 흰색 셔츠 위에 얇은 브이넥 조끼',
+                bottom: '베이지색 정장 면바지',
+                shoes: '깔끔한 단색 가죽 스니커즈',
+                accessory: '심플한 손목시계와 단정한 토트백',
+              },
+            ],
+            cool: [
+              {
+                outer: '모임이나 외출에 어울리는 단정한 니트 카디건',
+                top: '구김 없는 면 혼방 셔츠 또는 블라우스',
+                bottom: '발목까지 단정하게 떨어지는 일자 슬랙스',
+                shoes: '편안한 쿠션 인솔의 로퍼',
+                accessory: '가벼운 가죽 크로스백',
+              },
+              {
+                outer: '가벼운 노카라 재킷',
+                top: '깔끔한 단색 긴팔 티셔츠',
+                bottom: '어두운 톤의 깔끔한 정장 면바지',
+                shoes: '부드러운 스웨이드 단화',
+                accessory: '얇은 실크 스카프와 파우치',
+              },
+            ],
+            mild: [
+              {
+                outer: '실내외 온도 차이에 맞춰 입고 벗기 좋은 얇은 카디건',
+                top: '단정한 7부 소매 또는 반팔 니트',
+                bottom: '가벼운 원단의 베이지 슬랙스',
+                shoes: '착화감이 편한 깔끔한 가죽 단화',
+                accessory: '단정한 토트백',
+              },
+              {
+                outer: '얇고 가벼운 면 재킷',
+                top: '산뜻한 하늘색 면 셔츠',
+                bottom: '통기성 좋은 일자 핏 슬랙스',
+                shoes: '깔끔한 화이트 가죽 스니커즈',
+                accessory: '단정한 손목시계',
+              },
+            ],
+            warm: [
+              {
+                outer: '냉방이 강한 곳을 대비한 아주 얇은 여름용 카디건',
+                top: '시원하고 단정한 반팔 카라 니트 또는 블라우스',
+                bottom: '바람이 잘 통하는 얇은 여름 슬랙스',
+                shoes: '발이 편하고 시원한 로퍼형 단화',
+                accessory: '작은 크로스백과 손수건',
+              },
+              {
+                outer: '휴대하기 편한 얇은 린넨 재킷',
+                top: '깔끔한 반팔 면 셔츠',
+                bottom: '밝은 회색 계열의 얇은 면바지',
+                shoes: '통풍이 좋은 가죽 슬립온',
+                accessory: '가벼운 토트백',
+              },
+            ],
+            hot: [
+              {
+                outer: '생략 (병원·관공서 냉방 대비용 아주 얇은 숄 카디건만 휴대)',
+                top: '땀이 덜 비치는 린넨 혼방 반팔 셔츠',
+                bottom: '시원한 냉감 원단의 와이드 슬랙스',
+                shoes: '발등이 시원하고 단정한 블로퍼 또는 샌들 단화',
+                accessory: '자외선을 막아주는 단색 양산',
+              },
+              {
+                outer: '생략 (얇은 반팔 차림으로 시원하게 착용)',
+                top: '단정한 브이넥 반팔 블라우스 또는 카라 티셔츠',
+                bottom: '가볍고 구김 적은 여름용 정장 바지',
+                shoes: '통기성 좋은 깔끔한 메쉬 단화',
+                accessory: '부채 또는 손수건과 가벼운 숄더백',
+              },
+            ],
+          },
+          active: {
+            freezing: [
+              {
+                outer: '바람과 추위를 막아주는 두툼한 스포츠 다운 패딩',
+                top: '땀 배출이 좋은 기능성 긴팔 위에 기모 집업',
+                bottom: '보온 안감이 있는 기모 조거 트레이닝 팬츠',
+                shoes: '발목을 잡아주는 쿠션 좋은 트레킹 운동화',
+                accessory: '따뜻한 방한 모자와 스포츠 장갑',
+              },
+              {
+                outer: '가볍고 따뜻한 패딩 베스트와 기모 바람막이',
+                top: '보온 기능성 내의와 도톰한 후드 티셔츠',
+                bottom: '방풍 기능이 있는 겨울용 운동 바지',
+                shoes: '미끄럼 방지 밑창의 방한 러닝화',
+                accessory: '귀를 덮는 헤어밴드와 보온 물통 파우치',
+              },
+            ],
+            chilly: [
+              {
+                outer: '찬 바람을 막아주는 안감 있는 바람막이 점퍼',
+                top: '가벼운 긴팔 기능성 티셔츠와 얇은 집업',
+                bottom: '움직임이 편한 스트레치 트레이닝 바지',
+                shoes: '발걸음이 가벼운 워킹화',
+                accessory: '가벼운 볼캡 모자와 힙색',
+              },
+              {
+                outer: '활동하기 좋은 플리스 집업 재킷',
+                top: '통기성 좋은 긴팔 스포츠 티셔츠',
+                bottom: '신축성 뛰어난 조거 팬츠',
+                shoes: '쿠션감 좋은 런닝화',
+                accessory: '넥워머와 작은 슬링백',
+              },
+            ],
+            cool: [
+              {
+                outer: '땀이 식지 않게 막아주는 가벼운 방풍 바람막이',
+                top: '쾌적한 긴팔 기능성 라운드 티셔츠',
+                bottom: '가볍고 잘 늘어나는 운동용 긴바지',
+                shoes: '발바닥 충격을 줄여주는 워킹화',
+                accessory: '햇빛을 가리는 스포츠 캡 모자',
+              },
+              {
+                outer: '얇은 집업 트레이닝 재킷',
+                top: '반팔 기능성 티셔츠 (더우면 겉옷 벗기 편한 구성)',
+                bottom: '편안한 스웨트 조거 팬츠',
+                shoes: '가벼운 트레일 러닝화',
+                accessory: '가벼운 스포츠 백팩',
+              },
+            ],
+            mild: [
+              {
+                outer: '체온 유지를 돕는 아주 얇은 초경량 바람막이',
+                top: '땀이 빨리 마르는 반팔 기능성 티셔츠',
+                bottom: '움직임이 자유로운 얇은 트레이닝 바지',
+                shoes: '통기성 좋은 경량 러닝화',
+                accessory: '챙 있는 스포츠 모자와 손목 아대',
+              },
+              {
+                outer: '아침저녁 산책 시 걸칠 얇은 후드 집업',
+                top: '통풍 잘되는 메쉬 반팔 티셔츠',
+                bottom: '신축성 좋은 9부 운동 바지',
+                shoes: '발이 편한 데일리 워킹화',
+                accessory: '가벼운 허리 파우치와 땀 닦는 수건',
+              },
+            ],
+            warm: [
+              {
+                outer: '그늘이나 실내에서만 걸칠 얇은 자외선 차단 바람막이',
+                top: '시원한 쿨링 기능성 반팔 티셔츠',
+                bottom: '가볍고 시원한 운동용 반바지 또는 7부 바지',
+                shoes: '바람이 잘 통하는 메쉬 운동화',
+                accessory: '스포츠 선글라스와 통풍 좋은 모자',
+              },
+              {
+                outer: '생략 (팔 토시로 자외선만 가볍게 차단)',
+                top: '땀 배출이 빠른 민소매 또는 반팔 스포츠 셔츠',
+                bottom: '통풍이 뛰어난 얇은 나일론 운동 바지',
+                shoes: '가볍고 쿠션 좋은 워킹화',
+                accessory: '물병을 넣기 편한 가벼운 크로스 파우치',
+              },
+            ],
+            hot: [
+              {
+                outer: '생략 (햇볕이 강하면 얇은 쿨토시 착용)',
+                top: '초경량 냉감 기능성 반팔 티셔츠',
+                bottom: '땀이 달라붙지 않는 시원한 스포츠 반바지',
+                shoes: '통풍구가 넓은 경량 운동화',
+                accessory: '넓은 챙의 통풍 모자와 쿨 스카프',
+              },
+              {
+                outer: '생략 (가장 가볍고 시원한 단독 차림)',
+                top: '바람이 술술 통하는 메쉬 반팔 티셔츠',
+                bottom: '속건성 얇은 반바지',
+                shoes: '가볍고 발이 시원한 아웃도어 샌들 또는 메쉬화',
+                accessory: '자외선 차단 선글라스와 손수건',
+              },
+            ],
+          },
+          classic: {
+            freezing: [
+              {
+                outer: '고급스럽고 보온성이 뛰어난 울·캐시미어 롱 코트',
+                top: '품위 있는 하이넥 캐시미어 니트와 얇은 내의',
+                bottom: '도톰한 울 혼방 정장 바지',
+                shoes: '단정하고 튼튼한 가죽 앵클부츠 또는 구두',
+                accessory: '잔잔한 체크 머플러와 가죽 장갑',
+              },
+              {
+                outer: '클래식한 디자인의 더블 버튼 울 코트',
+                top: '단정한 셔츠 위에 고급스러운 브이넥 니트',
+                bottom: '짙은 네이비 또는 그레이 모직 팬츠',
+                shoes: '광택이 은은한 가죽 로퍼',
+                accessory: '가죽 토트백과 따뜻한 울 머플러',
+              },
+            ],
+            chilly: [
+              {
+                outer: '선이 깔끔하게 떨어지는 클래식 트렌치코트',
+                top: '부드러운 메리노 울 니트 스웨터',
+                bottom: '단정한 핀턱 정장 팬츠',
+                shoes: '발이 편한 낮은 굽 클래식 구두',
+                accessory: '고급스러운 실크 스카프와 가죽 백',
+              },
+              {
+                outer: '차분한 헤링본 패턴의 울 재킷',
+                top: '아이보리 톤의 깔끔한 셔츠',
+                bottom: '어두운 갈색 또는 검정 정장 슬랙스',
+                shoes: '단정한 가죽 옥스퍼드화 또는 로퍼',
+                accessory: '클래식한 가죽 벨트와 손목시계',
+              },
+            ],
+            cool: [
+              {
+                outer: '격식과 품위가 느껴지는 네이비 테일러드 재킷',
+                top: '부드러운 면 셔츠 또는 얇은 니트',
+                bottom: '잘 다려진 베이지 또는 그레이 슬랙스',
+                shoes: '착화감이 좋은 가죽 로퍼',
+                accessory: '단정한 스카프와 가죽 토트백',
+              },
+              {
+                outer: '차분한 색감의 트위드 또는 코튼 블레이저',
+                top: '단아한 크림색 블라우스 또는 면 셔츠',
+                bottom: '차분한 다크 네이비 일자 바지',
+                shoes: '깔끔한 로우힐 단화',
+                accessory: '은은한 진주 또는 메탈 포인트 소품',
+              },
+            ],
+            mild: [
+              {
+                outer: '가볍고 단정한 린넨 혼방 클래식 재킷',
+                top: '품위 있는 얇은 골지 니트 또는 면 셔츠',
+                bottom: '여유롭게 떨어지는 고급스러운 슬랙스',
+                shoes: '부드러운 가죽 로퍼',
+                accessory: '차분한 색상의 가죽 숄더백',
+              },
+              {
+                outer: '얇은 가디건형 트위드 재킷',
+                top: '구김이 적은 깔끔한 반팔 블라우스나 셔츠',
+                bottom: '밝은 아이보리 톤의 정장 바지',
+                shoes: '발이 편한 가죽 단화',
+                accessory: '클래식한 손목시계',
+              },
+            ],
+            warm: [
+              {
+                outer: '실내 모임에서 가볍게 걸칠 얇은 여름용 블레이저',
+                top: '통기성 좋은 실크 또는 면 혼방 반팔 셔츠',
+                bottom: '시원한 여름용 울·린넨 슬랙스',
+                shoes: '통풍이 편한 단정한 가죽 로퍼',
+                accessory: '가벼운 가죽 토트백과 손수건',
+              },
+              {
+                outer: '얇고 힘 있는 린넨 재킷',
+                top: '차분한 색감의 반팔 니트 폴로 셔츠',
+                bottom: '가볍게 떨어지는 베이지 여름 정장 바지',
+                shoes: '발이 편한 스웨이드 로퍼',
+                accessory: '선글라스와 깔끔한 작은 가방',
+              },
+            ],
+            hot: [
+              {
+                outer: '격식 있는 실내 냉방용으로 휴대하는 초경량 린넨 재킷',
+                top: '시원하고 구김 적은 고급 면 반팔 카라 셔츠',
+                bottom: '바람이 잘 통하는 얇은 여름 정장 슬랙스',
+                shoes: '발이 답답하지 않은 깔끔한 가죽 뮬 또는 로퍼',
+                accessory: '단색 양산과 가죽 핸드백',
+              },
+              {
+                outer: '생략 (실내외 겸용 얇은 가디건만 가방에 준비)',
+                top: '우아하고 시원한 린넨 반팔 블라우스 또는 셔츠',
+                bottom: '통풍 좋은 밝은 톤 여름 슬랙스',
+                shoes: '발 편한 얇은 가죽 샌들 단화',
+                accessory: '부채 또는 손수건과 가죽 파우치',
+              },
+            ],
+          },
+        };
+
+        const styleGroup = presets[styleId] || presets.casual;
+        const bandList = styleGroup[band] || styleGroup.mild;
+        const chosen = {...pick(bandList)};
+
+        // Apply layering note for large diurnal temp difference
+        if (isWideDiff && !chosen.outer.includes('껴입') && band !== 'freezing') {
+          if (chosen.outer.startsWith('생략')) {
+            chosen.outer = '일교차에 대비해 가볍게 걸칠 수 있는 얇은 카디건이나 셔츠를 챙기세요';
+          } else {
+            chosen.outer = `${chosen.outer} (일교차가 커서 벗고 입기 편하게 겹쳐 입으세요)`;
+          }
+        }
+
+        // Senior-friendly comfort/safety adjustment
+        if (isSenior && (band === 'chilly' || band === 'cool')) {
+          if (!chosen.accessory.includes('스카프') && !chosen.accessory.includes('머플러')) {
+            chosen.accessory = `${chosen.accessory}, 목을 따뜻하게 보호하는 얇은 스카프`;
+          }
+        }
+
+        // Rain / snow safety override
+        if (isRainy) {
+          chosen.shoes =
+            styleId === 'classic' || styleId === 'neat'
+              ? '미끄러지지 않는 발수 가죽 단화 또는 방수 로퍼'
+              : '물기가 스며들지 않는 방수 스니커즈나 미끄럼 방지 운동화';
+          chosen.accessory = `튼튼한 접이식 우산과 ${chosen.accessory}`;
+        } else if (isSnowy) {
+          chosen.shoes = '눈길에 미끄러지지 않는 바닥 홈 깊은 방한화 또는 트레킹화';
+          chosen.accessory = `우산과 ${chosen.accessory}`;
+        }
+
+        // Weather-grounded single-sentence reason
+        let reason = '';
+        if (isRainy) {
+          reason = `오늘 비 올 확률이 ${weather.precipitationProbability}%이고 체감온도가 ${feelsLike}℃여서 비에 대비한 신발과 우산을 챙기면서 따뜻하게 입으시는 게 좋아요.`;
+        } else if (isSnowy) {
+          reason = `눈 소식과 함께 체감온도가 ${feelsLike}℃로 낮으니 보온이 잘되는 겉옷과 미끄럼 방지 신발로 안전하게 입으시길 추천해요.`;
+        } else if (isWideDiff) {
+          reason = `최저 ${weather.tempMin}℃에서 최고 ${weather.tempMax}℃까지 일교차가 ${tempDiff}℃로 크게 벌어져 아침저녁과 낮 기온에 맞춰 벗고 입기 좋은 옷차림이 가장 편안해요.`;
+        } else if (feelsLike <= 4) {
+          reason = `체감온도가 ${feelsLike}℃로 많이 춥기 때문에 찬 바람을 막아주는 두툼한 겉옷과 보온 소품으로 체온을 꼭 지켜주세요.`;
+        } else if (feelsLike <= 16) {
+          reason = `지금 기온 ${weather.temperature}℃(체감 ${feelsLike}℃)로 다소 선선한 편이어서 가벼운 겉옷과 긴팔 차림이 딱 적당해요.`;
+        } else if (feelsLike <= 22) {
+          reason = `기온이 ${weather.temperature}℃로 활동하기 쾌적하지만 바람이 불 때를 대비해 얇은 겉옷을 곁들이시면 좋아요.`;
+        } else {
+          reason = `체감온도가 ${feelsLike}℃로 따뜻하고 더운 편이니 통풍이 잘되는 가벼운 소재로 시원하게 입으시는 것을 추천해요.`;
+        }
+
+        return {
+          outer: chosen.outer,
+          top: chosen.top,
+          bottom: chosen.bottom,
+          shoes: chosen.shoes,
+          accessory: chosen.accessory,
+          reason,
+        };
+      }
+
+      // =========================================================================
+      // Style Illustrations (src/components/StyleIllustrations.tsx)
+      // =========================================================================
+      function CasualIllustration({selected = false}) {
+        return (
+          <svg
+            viewBox="0 0 88 88"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-full"
+            aria-hidden="true"
+          >
+            <rect
+              x="4"
+              y="4"
+              width="80"
+              height="80"
+              rx="18"
+              fill={selected ? '#E0F2FE' : '#F0F9FF'}
+            />
+            <path
+              d="M32 22C34 27 38.5 29.5 44 29.5C49.5 29.5 54 27 56 22L68 27.5L73 43L64 46L61 36V56H27V36L24 46L15 43L20 27.5L32 22Z"
+              fill="#38BDF8"
+              stroke="#0F2942"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M35 23.2C37.2 26.8 40.3 28.5 44 28.5C47.7 28.5 50.8 26.8 53 23.2"
+              stroke="#FFFFFF"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            />
+            <rect
+              x="27"
+              y="52"
+              width="34"
+              height="4.5"
+              rx="1.5"
+              fill="#0284C7"
+              stroke="#0F2942"
+              strokeWidth="2"
+            />
+            <path
+              d="M29 56.5H59L61 75H47.5L44 63.5L40.5 75H27L29 56.5Z"
+              fill="#BAE6FD"
+              stroke="#0F2942"
+              strokeWidth="2.4"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M33 60C33 62.5 34.5 64 36.5 64.5"
+              stroke="#0F2942"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+            <path
+              d="M55 60C55 62.5 53.5 64 51.5 64.5"
+              stroke="#0F2942"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+        );
+      }
+
+      function NeatIllustration({selected = false}) {
+        return (
+          <svg
+            viewBox="0 0 88 88"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-full"
+            aria-hidden="true"
+          >
+            <rect
+              x="4"
+              y="4"
+              width="80"
+              height="80"
+              rx="18"
+              fill={selected ? '#E0F2FE' : '#F0F9FF'}
+            />
+            <path
+              d="M34 20H54L68 27L72 44L63 46L60 35V57H28V35L25 46L16 44L20 27L34 20Z"
+              fill="#FFFFFF"
+              stroke="#0F2942"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M34 20L44 37L54 20L60 23.5V57H28V23.5L34 20Z"
+              fill="#0284C7"
+              stroke="#0F2942"
+              strokeWidth="2.4"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M35 20L41 28L44 23L47 28L53 20"
+              fill="#FFFFFF"
+              stroke="#0F2942"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="44" cy="42" r="1.8" fill="#FFFFFF" />
+            <circle cx="44" cy="49" r="1.8" fill="#FFFFFF" />
+            <path
+              d="M29 57H59L60.5 75H47L44 63L41 75H27.5L29 57Z"
+              fill="#1E3A5F"
+              stroke="#0F2942"
+              strokeWidth="2.4"
+              strokeLinejoin="round"
+            />
+          </svg>
+        );
+      }
+
+      function ActiveIllustration({selected = false}) {
+        return (
+          <svg
+            viewBox="0 0 88 88"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-full"
+            aria-hidden="true"
+          >
+            <rect
+              x="4"
+              y="4"
+              width="80"
+              height="80"
+              rx="18"
+              fill={selected ? '#E0F2FE' : '#F0F9FF'}
+            />
+            <path
+              d="M58 14C62.5 14 66 17.2 66 21H52C52 17.2 54.6 14 58 14Z"
+              fill="#38BDF8"
+              stroke="#0F2942"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M66 21H71.5"
+              stroke="#0F2942"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M33 22H55L67 29L72 46L63 48L59.5 37V58H28.5V37L25 48L16 46L21 29L33 22Z"
+              fill="#0EA5E9"
+              stroke="#0F2942"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M35 22L37 17H51L53 22"
+              fill="#BAE6FD"
+              stroke="#0F2942"
+              strokeWidth="2.2"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M44 22V58"
+              stroke="#FFFFFF"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+            <path d="M28.5 34.5H59.5" stroke="#E0F2FE" strokeWidth="3" />
+            <path
+              d="M29.5 58H58.5L59.5 73H47L44 63.5L41 73H28.5L29.5 58Z"
+              fill="#0F2942"
+              stroke="#0F2942"
+              strokeWidth="2.2"
+              strokeLinejoin="round"
+            />
+            <rect
+              x="27"
+              y="73"
+              width="14"
+              height="4.5"
+              rx="2"
+              fill="#FFFFFF"
+              stroke="#0F2942"
+              strokeWidth="1.8"
+            />
+            <rect
+              x="47"
+              y="73"
+              width="14"
+              height="4.5"
+              rx="2"
+              fill="#FFFFFF"
+              stroke="#0F2942"
+              strokeWidth="1.8"
+            />
+          </svg>
+        );
+      }
+
+      function ClassicIllustration({selected = false}) {
+        return (
+          <svg
+            viewBox="0 0 88 88"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-full"
+            aria-hidden="true"
+          >
+            <rect
+              x="4"
+              y="4"
+              width="80"
+              height="80"
+              rx="18"
+              fill={selected ? '#E0F2FE' : '#F0F9FF'}
+            />
+            <path
+              d="M33 20H55L68 27L72 48L63 50L60 36V73H28V36L25 50L16 48L20 27L33 20Z"
+              fill="#1E3A5F"
+              stroke="#0F2942"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M36 20L44 41L52 20H36Z"
+              fill="#FFFFFF"
+              stroke="#0F2942"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M34 20L39.5 34L33 36L31 27"
+              fill="#335C8E"
+              stroke="#0F2942"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M54 20L48.5 34L55 36L57 27"
+              fill="#335C8E"
+              stroke="#0F2942"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+            <rect
+              x="28"
+              y="46"
+              width="32"
+              height="4.5"
+              fill="#7DD3FC"
+              stroke="#0F2942"
+              strokeWidth="1.8"
+            />
+            <rect
+              x="41.5"
+              y="45"
+              width="5"
+              height="6.5"
+              rx="1"
+              fill="#E0F2FE"
+              stroke="#0F2942"
+              strokeWidth="1.8"
+            />
+            <circle cx="44" cy="57" r="1.8" fill="#BAE6FD" />
+            <circle cx="44" cy="64" r="1.8" fill="#BAE6FD" />
+          </svg>
+        );
+      }
+
+      // =========================================================================
+      // WeatherScreen (src/components/WeatherScreen.tsx)
+      // =========================================================================
+      function WeatherScreen({onBack, onProceedToRecommend}) {
+        const [geoStatus, setGeoStatus] = useState('idle');
+        const [selectedCity, setSelectedCity] = useState(null);
+        const [selectedSeoulDistrict, setSelectedSeoulDistrict] = useState(null);
+        const [dongSearch, setDongSearch] = useState('');
+        const [activeLocation, setActiveLocation] = useState(null);
+
+        const [weather, setWeather] = useState(null);
+        const [isLoadingWeather, setIsLoadingWeather] = useState(false);
+        const [weatherError, setWeatherError] = useState(null);
+        const [nudgeLocation, setNudgeLocation] = useState(false);
+
+        const locationHeadingRef = useRef(null);
+        const weatherCardRef = useRef(null);
+        const abortRef = useRef(null);
+
+        const loadWeatherForCoords = useCallback(async (lat, lon) => {
+          if (abortRef.current) {
+            abortRef.current.abort();
+          }
+          const controller = new AbortController();
+          abortRef.current = controller;
+
+          setIsLoadingWeather(true);
+          setWeatherError(null);
+
+          try {
+            const result = await fetchOpenMeteoWeather(lat, lon, controller.signal);
+            if (!controller.signal.aborted) {
+              setWeather(result);
+            }
+          } catch (err) {
+            if (err instanceof DOMException && err.name === 'AbortError') {
+              return;
+            }
+            if (!controller.signal.aborted) {
+              setWeather(null);
+              setWeatherError('날씨를 불러오지 못했어요. 다시 시도해 주세요.');
+            }
+          } finally {
+            if (!controller.signal.aborted) {
+              setIsLoadingWeather(false);
+            }
+          }
+        }, []);
+
+        const requestCurrentLocation = useCallback(() => {
+          if (typeof navigator === 'undefined' || !navigator.geolocation) {
+            setGeoStatus('failed');
+            return;
+          }
+
+          setGeoStatus('checking');
+
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const {latitude, longitude} = position.coords;
+              setGeoStatus('granted');
+              setSelectedCity(null);
+              setSelectedSeoulDistrict(null);
+              setDongSearch('');
+              setActiveLocation({
+                label: '현재 위치',
+                lat: latitude,
+                lon: longitude,
+              });
+              void loadWeatherForCoords(latitude, longitude);
+            },
+            () => {
+              setGeoStatus('failed');
+            },
+            {
+              enableHighAccuracy: false,
+              timeout: 6000,
+              maximumAge: 0,
+            },
+          );
+        }, [loadWeatherForCoords]);
+
+        useEffect(() => {
+          requestCurrentLocation();
+          return () => {
+            if (abortRef.current) {
+              abortRef.current.abort();
+            }
+          };
+        }, [requestCurrentLocation]);
+
+        const handleSelectCity = (cityId) => {
+          setSelectedCity(cityId);
+          setSelectedSeoulDistrict(null);
+          setDongSearch('');
+        };
+
+        const handleSelectSubRegion = (cityName, subRegion) => {
+          const fullLabel = subRegion.district
+            ? `${cityName} ${subRegion.district} ${subRegion.name}`
+            : `${cityName} ${subRegion.name}`;
+
+          setActiveLocation({
+            label: fullLabel,
+            lat: subRegion.lat,
+            lon: subRegion.lon,
+            subRegionId: subRegion.id,
+          });
+          void loadWeatherForCoords(subRegion.lat, subRegion.lon);
+
+          requestAnimationFrame(() => {
+            if (weatherCardRef.current) {
+              weatherCardRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+              });
+            }
+          });
+        };
+
+        const filteredSeoulDongs = useMemo(() => {
+          const keyword = dongSearch.trim();
+          if (keyword.length > 0) {
+            return SEOUL_DONGS.filter(
+              (dong) =>
+                dong.name.includes(keyword) ||
+                (dong.district && dong.district.includes(keyword)),
+            );
+          }
+          if (selectedSeoulDistrict) {
+            return SEOUL_DONGS.filter((dong) => dong.district === selectedSeoulDistrict);
+          }
+          return [];
+        }, [dongSearch, selectedSeoulDistrict]);
+
+        const selectedCityInfo = useMemo(
+          () => CITIES.find((c) => c.id === selectedCity) ?? null,
+          [selectedCity],
+        );
+
+        const locationMessage =
+          geoStatus === 'failed'
+            ? '위치를 찾지 못했어요. 지역을 골라 주세요'
+            : '지역을 골라 주세요';
+
+        const handleRecommendClick = () => {
+          if (!activeLocation || !weather || isLoadingWeather) {
+            setNudgeLocation(false);
+            requestAnimationFrame(() => {
+              setNudgeLocation(true);
+            });
+            if (locationHeadingRef.current) {
+              locationHeadingRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+              });
+            }
+            return;
+          }
+          onProceedToRecommend(activeLocation.label, weather);
+        };
+
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-sky-100/80 via-[#F4FAFF] to-[#FFFFFF] text-[#0F2942] flex flex-col">
+            {/* Top Header */}
+            <header className="w-full border-b border-sky-200/70 bg-white/80 backdrop-blur-sm">
+              <div className="max-w-3xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between">
+                <span className="text-xl sm:text-2xl font-bold tracking-tight text-sky-700 whitespace-nowrap shrink-0">
+                  오늘 착장
+                </span>
+                <span className="text-sm sm:text-base font-medium text-sky-700/80 whitespace-nowrap shrink-0">
+                  오늘 날씨
+                </span>
+              </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="flex-1 w-full max-w-3xl mx-auto px-5 sm:px-8 pt-6 pb-10 sm:pt-9 sm:pb-12">
+              {/* Intro Heading */}
+              <div className="mb-7 sm:mb-8">
+                <h1 className="text-[28px] sm:text-[34px] font-bold tracking-tight text-[#0F2942] leading-tight text-balance">
+                  오늘 날씨
+                </h1>
+                <p className="mt-2 text-base sm:text-lg text-slate-600 leading-relaxed">
+                  지금 계신 곳의 날씨를 확인한 뒤 옷차림을 알아보세요.
+                </p>
+              </div>
+
+              {/* Weather Summary Card (Loading / Loaded / Error) */}
+              {(isLoadingWeather || weather || weatherError) && (
+                <section
+                  ref={weatherCardRef}
+                  aria-live="polite"
+                  className="mb-8 rounded-3xl border-2 border-sky-300 bg-white p-5 sm:p-7 shadow-md shadow-sky-200/50"
+                >
+                  {isLoadingWeather ? (
+                    <div className="flex items-center justify-center gap-3 py-5 text-sky-700">
+                      <Loader2 className="w-6 h-6 animate-spin shrink-0" aria-hidden="true" />
+                      <span className="text-xl sm:text-2xl font-bold">
+                        날씨를 확인하는 중…
+                      </span>
+                    </div>
+                  ) : weatherError ? (
+                    <div className="text-center py-3">
+                      <p className="text-lg font-semibold text-[#0F2942]">{weatherError}</p>
+                      {activeLocation && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void loadWeatherForCoords(activeLocation.lat, activeLocation.lon)
+                          }
+                          className="mt-4 min-h-[48px] px-6 py-2.5 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white text-base font-bold transition-colors cursor-pointer"
+                        >
+                          다시 확인하기
+                        </button>
+                      )}
+                    </div>
+                  ) : weather ? (
+                    <div>
+                      {activeLocation && (
+                        <div className="flex items-center gap-1.5 text-base sm:text-lg font-semibold text-sky-700 mb-3">
+                          <MapPin className="w-5 h-5 shrink-0" aria-hidden="true" />
+                          <span>{activeLocation.label}</span>
+                        </div>
+                      )}
+
+                      <p className="text-2xl sm:text-[28px] font-bold text-[#0F2942] leading-snug tabular-nums">
+                        {weather.weatherEmoji} 지금 {weather.temperature}℃ (체감{' '}
+                        {weather.apparentTemperature}℃) · {weather.weatherLabel}
+                      </p>
+
+                      <p className="mt-3 text-lg sm:text-xl font-semibold text-slate-700 leading-relaxed tabular-nums">
+                        오늘 최저 {weather.tempMin}℃ · 최고 {weather.tempMax}℃ · 비 올 확률{' '}
+                        {weather.precipitationProbability}%
+                      </p>
+                    </div>
+                  ) : null}
+                </section>
+              )}
+
+              {/* Location Selection Section */}
+              <section ref={locationHeadingRef} aria-labelledby="location-heading">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                  <div>
+                    <h2
+                      id="location-heading"
+                      onAnimationEnd={() => setNudgeLocation(false)}
+                      className={`text-xl sm:text-2xl font-bold text-[#0F2942] ${
+                        nudgeLocation ? 'animate-nudge text-sky-700' : ''
+                      }`}
+                    >
+                      {locationMessage}
+                    </h2>
+                    {geoStatus === 'checking' && (
+                      <p className="mt-1 text-sm sm:text-base text-sky-700 font-medium flex items-center gap-1.5">
+                        <Loader2 className="w-4 h-4 animate-spin shrink-0" aria-hidden="true" />
+                        <span>현재 위치를 찾는 중이에요… 아래에서 바로 고르실 수도 있어요.</span>
+                      </p>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={requestCurrentLocation}
+                    disabled={geoStatus === 'checking'}
+                    className="min-h-[44px] px-4 py-2 rounded-xl border-2 border-sky-300 bg-white hover:bg-sky-50 text-sky-700 text-sm sm:text-base font-bold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60 whitespace-nowrap shrink-0"
+                  >
+                    <LocateFixed className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    <span>내 위치 찾기</span>
+                  </button>
+                </div>
+
+                {/* 1. City Selection Grid (8 Cities) */}
+                <div className="grid grid-cols-4 gap-2.5 sm:gap-3">
+                  {CITIES.map((city) => {
+                    const isSelected = selectedCity === city.id;
+                    return (
+                      <button
+                        key={city.id}
+                        type="button"
+                        aria-pressed={isSelected}
+                        onClick={() => handleSelectCity(city.id)}
+                        className={`min-h-[54px] sm:min-h-[60px] px-2 py-2.5 rounded-2xl text-lg sm:text-xl font-bold transition-all duration-150 flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 active:scale-[0.98] whitespace-nowrap cursor-pointer ${
+                          isSelected
+                            ? 'bg-sky-600 text-white border-[3px] border-sky-700 shadow-md shadow-sky-600/20'
+                            : 'bg-white text-[#0F2942] border-2 border-sky-200 hover:border-sky-400 hover:bg-sky-50/70'
+                        }`}
+                      >
+                        {isSelected && (
+                          <Check className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 stroke-[3]" aria-hidden="true" />
+                        )}
+                        <span>{city.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* 2. Sub-region Selection */}
+                {selectedCity === 'seoul' && (
+                  <div className="mt-6 rounded-3xl border-2 border-sky-200 bg-white p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                      <h3 className="text-lg sm:text-xl font-bold text-[#0F2942]">
+                        서울의 동을 골라 주세요
+                      </h3>
+                      <span className="text-sm sm:text-base text-sky-700 font-medium">
+                        구를 누르거나 동 이름으로 찾아보세요
+                      </span>
+                    </div>
+
+                    {/* Search Dong Input */}
+                    <div className="relative mb-5">
+                      <Search
+                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                        aria-hidden="true"
+                      />
+                      <input
+                        type="text"
+                        value={dongSearch}
+                        onChange={(e) => setDongSearch(e.target.value)}
+                        placeholder="동 이름 검색 (예: 역삼동, 잠실동, 여의도동)"
+                        aria-label="서울 동 이름 검색"
+                        className="w-full min-h-[52px] pl-11 pr-11 py-3 rounded-2xl border-2 border-sky-200 bg-[#F8FCFF] text-base sm:text-lg text-[#0F2942] placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
+                      />
+                      {dongSearch && (
+                        <button
+                          type="button"
+                          onClick={() => setDongSearch('')}
+                          aria-label="검색어 지우기"
+                          className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:bg-sky-100 absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* If not searching, show 구 selection first */}
+                    {dongSearch.trim().length === 0 && (
+                      <div className="mb-5">
+                        <p className="text-sm sm:text-base font-semibold text-slate-600 mb-2.5">
+                          1) 먼저 구를 골라 주세요
+                        </p>
+                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                          {SEOUL_DISTRICTS.map((district) => {
+                            const isDistrictSelected = selectedSeoulDistrict === district;
+                            return (
+                              <button
+                                key={district}
+                                type="button"
+                                aria-pressed={isDistrictSelected}
+                                onClick={() => setSelectedSeoulDistrict(district)}
+                                className={`min-h-[46px] px-2 py-2 rounded-xl text-sm sm:text-base font-bold transition-colors whitespace-nowrap cursor-pointer ${
+                                  isDistrictSelected
+                                    ? 'bg-sky-100 text-sky-900 border-2 border-sky-600'
+                                    : 'bg-[#F5FAFF] text-slate-700 border border-sky-200 hover:border-sky-400'
+                                }`}
+                              >
+                                {district}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Dong Buttons */}
+                    {(dongSearch.trim().length > 0 || selectedSeoulDistrict) && (
+                      <div>
+                        <p className="text-sm sm:text-base font-semibold text-slate-600 mb-2.5">
+                          {dongSearch.trim().length > 0
+                            ? '검색된 동을 골라 주세요'
+                            : `2) ${selectedSeoulDistrict}의 동을 골라 주세요`}
+                        </p>
+
+                        {filteredSeoulDongs.length === 0 ? (
+                          <p className="py-4 text-center text-base text-slate-500">
+                            일치하는 동을 찾지 못했어요. 구 목록에서 선택해 보세요.
+                          </p>
+                        ) : (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                            {filteredSeoulDongs.map((dong) => {
+                              const isSelected =
+                                (activeLocation && activeLocation.subRegionId) === dong.id;
+                              return (
+                                <button
+                                  key={dong.id}
+                                  type="button"
+                                  aria-pressed={isSelected}
+                                  onClick={() => handleSelectSubRegion('서울', dong)}
+                                  className={`min-h-[52px] px-3 py-2.5 rounded-2xl text-base sm:text-lg font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                                    isSelected
+                                      ? 'bg-sky-600 text-white border-[3px] border-sky-700 shadow-sm'
+                                      : 'bg-white text-[#0F2942] border-2 border-sky-200 hover:border-sky-400 hover:bg-sky-50'
+                                  }`}
+                                >
+                                  {isSelected && (
+                                    <Check className="w-4 h-4 shrink-0 stroke-[3]" aria-hidden="true" />
+                                  )}
+                                  <span className="truncate">{dong.name}</span>
+                                  {dongSearch.trim().length > 0 && dong.district && (
+                                    <span
+                                      className={`text-xs sm:text-sm font-medium shrink-0 ${
+                                        isSelected ? 'text-sky-100' : 'text-slate-500'
+                                      }`}
+                                    >
+                                      ({dong.district})
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {selectedCity && selectedCity !== 'seoul' && selectedCityInfo && (
+                  <div className="mt-6 rounded-3xl border-2 border-sky-200 bg-white p-4 sm:p-6">
+                    <h3 className="text-lg sm:text-xl font-bold text-[#0F2942] mb-4">
+                      {selectedCityInfo.name}의 {selectedCityInfo.subUnitLabel}
+                      {selectedCityInfo.subUnitLabel === '지역' ? '을' : '를'} 골라 주세요
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
+                      {OTHER_CITY_SUBREGIONS[selectedCity].map((sub) => {
+                        const isSelected =
+                          (activeLocation && activeLocation.subRegionId) === sub.id;
+                        return (
+                          <button
+                            key={sub.id}
+                            type="button"
+                            aria-pressed={isSelected}
+                            onClick={() => handleSelectSubRegion(selectedCityInfo.name, sub)}
+                            className={`min-h-[54px] px-3 py-3 rounded-2xl text-base sm:text-lg font-bold transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                              isSelected
+                                ? 'bg-sky-600 text-white border-[3px] border-sky-700 shadow-sm'
+                                : 'bg-white text-[#0F2942] border-2 border-sky-200 hover:border-sky-400 hover:bg-sky-50'
+                            }`}
+                          >
+                            {isSelected && (
+                              <Check className="w-4 h-4 shrink-0 stroke-[3]" aria-hidden="true" />
+                            )}
+                            <span>{sub.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </section>
+            </main>
+
+            {/* Bottom Action Bar */}
+            <footer className="sticky bottom-0 z-20 w-full bg-gradient-to-t from-[#F4FAFF] via-[#F4FAFF]/95 to-transparent pt-3 pb-4 px-5 sm:px-8 border-t border-sky-100/80">
+              <div className="max-w-3xl mx-auto flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="min-h-[56px] sm:min-h-[60px] px-5 sm:px-7 rounded-2xl border-2 border-sky-300 bg-white hover:bg-sky-50 text-[#0F2942] text-lg sm:text-xl font-bold flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300"
+                >
+                  <ChevronLeft className="w-5 h-5 shrink-0" aria-hidden="true" />
+                  <span>이전</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleRecommendClick}
+                  className={`flex-1 min-h-[56px] sm:min-h-[60px] px-4 rounded-2xl text-lg sm:text-xl font-bold flex items-center justify-center gap-2 transition-all duration-150 whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 ${
+                    weather && !isLoadingWeather
+                      ? 'bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-600/25 active:scale-[0.99]'
+                      : 'bg-sky-500/85 hover:bg-sky-600 text-white shadow-md shadow-sky-500/15'
+                  }`}
+                >
+                  <span>🤖 옷차림 추천받기</span>
+                </button>
+              </div>
+            </footer>
+          </div>
+        );
+      }
+
+      // =========================================================================
+      // RecommendationScreen (src/components/RecommendationScreen.tsx)
+      // =========================================================================
+      function RecommendationScreen({
+        styleName,
+        styleDescription,
+        styleIllustration,
+        locationLabel,
+        weather,
+        recommendation,
+        isLoading,
+        hasError,
+        onRetryRecommend,
+        onStartOver,
+      }) {
+        const itemRows = recommendation
+          ? [
+              {emoji: '🧥', label: '겉옷', value: recommendation.outer},
+              {emoji: '👕', label: '상의', value: recommendation.top},
+              {emoji: '👖', label: '하의', value: recommendation.bottom},
+              {emoji: '👟', label: '신발', value: recommendation.shoes},
+              {emoji: '👜', label: '소품', value: recommendation.accessory},
+            ]
+          : [];
+
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-sky-100/80 via-[#F4FAFF] to-[#FFFFFF] text-[#0F2942] flex flex-col">
+            {/* Top Header */}
+            <header className="w-full border-b border-sky-200/70 bg-white/80 backdrop-blur-sm">
+              <div className="max-w-3xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between">
+                <span className="text-xl sm:text-2xl font-bold tracking-tight text-sky-700 whitespace-nowrap shrink-0">
+                  오늘 착장
+                </span>
+                <span className="text-sm sm:text-base font-medium text-sky-700/80 whitespace-nowrap shrink-0">
+                  오늘의 옷차림
+                </span>
+              </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="flex-1 w-full max-w-3xl mx-auto px-5 sm:px-8 pt-6 pb-10 sm:pt-9 sm:pb-12">
+              {/* Title */}
+              <div className="mb-5 sm:mb-6">
+                <h1 className="text-[28px] sm:text-[34px] font-bold tracking-tight text-[#0F2942] leading-tight text-balance">
+                  오늘의 옷차림
+                </h1>
+              </div>
+
+              {/* One-line Weather Summary at the Top */}
+              <div className="mb-6 rounded-2xl bg-sky-100/75 border border-sky-200 px-4 py-3 text-sm sm:text-base font-semibold text-[#0F2942] tabular-nums leading-snug">
+                <p className="sm:truncate">
+                  {locationLabel} · {weather.weatherEmoji} 지금 {weather.temperature}℃ (체감{' '}
+                  {weather.apparentTemperature}℃) · {weather.weatherLabel} · 최저{' '}
+                  {weather.tempMin}℃ / 최고 {weather.tempMax}℃ · 비 올 확률{' '}
+                  {weather.precipitationProbability}%
+                </p>
+              </div>
+
+              {/* Recommendation Card */}
+              <section
+                aria-live="polite"
+                className="rounded-3xl border-2 border-sky-200 bg-white p-5 sm:p-7 shadow-md shadow-sky-200/40"
+              >
+                {/* Selected Style Header */}
+                <div className="flex items-center gap-4 pb-5 border-b border-sky-100">
+                  <div className="w-18 h-18 sm:w-20 sm:h-20 shrink-0">
+                    {styleIllustration}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xl sm:text-2xl font-bold text-[#0F2942]">
+                      {styleName}
+                    </div>
+                    <p className="mt-1 text-sm sm:text-base text-slate-600">
+                      {styleDescription}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Loading State */}
+                {isLoading && (
+                  <div className="py-14 flex flex-col items-center justify-center text-center gap-4">
+                    <Loader2
+                      className="w-10 h-10 text-sky-600 animate-spin"
+                      aria-hidden="true"
+                    />
+                    <p className="text-xl sm:text-2xl font-bold text-sky-800">
+                      AI가 옷을 고르는 중이에요…
+                    </p>
+                  </div>
+                )}
+
+                {/* Error State */}
+                {!isLoading && hasError && (
+                  <div className="py-12 px-2 text-center">
+                    <p className="text-xl sm:text-2xl font-bold text-[#0F2942] leading-snug">
+                      지금은 추천할 수 없어요.
+                    </p>
+                    <p className="mt-2 text-base sm:text-lg text-slate-600">
+                      잠시 후 다시 눌러 주세요
+                    </p>
+                  </div>
+                )}
+
+                {/* Recommended Outfit Content */}
+                {!isLoading && !hasError && recommendation && (
+                  <div className="pt-5">
+                    <ul className="divide-y divide-sky-100">
+                      {itemRows.map((item) => (
+                        <li
+                          key={item.label}
+                          className="py-4 first:pt-1 flex items-start gap-3.5 sm:gap-4"
+                        >
+                          <span
+                            className="text-2xl sm:text-[26px] leading-none pt-0.5 shrink-0"
+                            aria-hidden="true"
+                          >
+                            {item.emoji}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm sm:text-base font-bold text-sky-700">
+                              {item.label}
+                            </div>
+                            <p className="mt-0.5 text-lg sm:text-xl font-bold text-[#0F2942] leading-snug">
+                              {item.value}
+                            </p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* 💡 추천 이유 */}
+                    <div className="mt-5 rounded-2xl bg-sky-50 border border-sky-200 p-4 sm:p-5">
+                      <div className="text-base sm:text-lg font-bold text-sky-800">
+                        💡 추천 이유
+                      </div>
+                      <p className="mt-1.5 text-base sm:text-lg font-medium text-[#0F2942] leading-relaxed">
+                        {recommendation.reason}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </section>
+            </main>
+
+            {/* Bottom Action Bar */}
+            <footer className="sticky bottom-0 z-20 w-full bg-gradient-to-t from-[#F4FAFF] via-[#F4FAFF]/95 to-transparent pt-3 pb-4 px-5 sm:px-8 border-t border-sky-100/80">
+              <div className="max-w-3xl mx-auto flex items-center gap-3">
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={onRetryRecommend}
+                  className={`flex-1 min-h-[56px] sm:min-h-[60px] px-4 rounded-2xl text-lg sm:text-xl font-bold flex items-center justify-center gap-2 transition-all duration-150 whitespace-nowrap focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 ${
+                    isLoading
+                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      : 'bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-600/25 active:scale-[0.99] cursor-pointer'
+                  }`}
+                >
+                  <RefreshCw className="w-5 h-5 shrink-0" aria-hidden="true" />
+                  <span>다시 추천받기</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={onStartOver}
+                  className={`min-h-[56px] sm:min-h-[60px] px-5 sm:px-7 rounded-2xl border-2 text-lg sm:text-xl font-bold flex items-center justify-center gap-2 transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 ${
+                    isLoading
+                      ? 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'
+                      : 'border-sky-300 bg-white hover:bg-sky-50 text-[#0F2942] cursor-pointer'
+                  }`}
+                >
+                  <Home className="w-5 h-5 shrink-0" aria-hidden="true" />
+                  <span>처음으로</span>
+                </button>
+              </div>
+            </footer>
+          </div>
+        );
+      }
+
+      // =========================================================================
+      // App (src/App.tsx)
+      // =========================================================================
+      const AGE_OPTIONS = ['20대', '30대', '40대', '50대', '60대', '70대 이상'];
+      const GENDER_OPTIONS = ['여성', '남성', '선택 안 함'];
+
+      const STYLE_OPTIONS = [
+        {
+          id: 'casual',
+          name: '편안한 캐주얼',
+          description: '동네 산책·장보기, 편하고 무난하게',
+          renderIllustration: (selected) => <CasualIllustration selected={selected} />,
+        },
+        {
+          id: 'neat',
+          name: '단정한 외출복',
+          description: '모임·병원·관공서, 깔끔하게',
+          renderIllustration: (selected) => <NeatIllustration selected={selected} />,
+        },
+        {
+          id: 'active',
+          name: '활동적인 운동복',
+          description: '걷기·등산·운동, 가볍고 따뜻하게',
+          renderIllustration: (selected) => <ActiveIllustration selected={selected} />,
+        },
+        {
+          id: 'classic',
+          name: '차분한 클래식',
+          description: '격식 있는 자리, 고급스럽게',
+          renderIllustration: (selected) => <ClassicIllustration selected={selected} />,
+        },
+      ];
+
+      function getObjectParticle(label) {
+        if (label === '연령대') {
+          return '를';
+        }
+        return '을';
+      }
+
+      function formatMissingMessage(missingLabels) {
+        if (missingLabels.length === 0) {
+          return '';
+        }
+        const lastLabel = missingLabels[missingLabels.length - 1];
+        const particle = getObjectParticle(lastLabel);
+        return `${missingLabels.join(', ')}${particle} 골라 주세요`;
+      }
+
+      function App() {
+        const [selectedAge, setSelectedAge] = useState(null);
+        const [selectedGender, setSelectedGender] = useState(null);
+        const [selectedStyle, setSelectedStyle] = useState(null);
+        const [nudgeActive, setNudgeActive] = useState(false);
+        const [currentStep, setCurrentStep] = useState('about');
+
+        const [weatherContext, setWeatherContext] = useState(null);
+        const [recommendation, setRecommendation] = useState(null);
+        const [isRecommending, setIsRecommending] = useState(false);
+        const [recommendError, setRecommendError] = useState(false);
+
+        const isRecommendingRef = useRef(false);
+        const recommendCountRef = useRef(0);
+        const ageSectionRef = useRef(null);
+        const genderSectionRef = useRef(null);
+        const styleSectionRef = useRef(null);
+
+        const missingItems = [];
+        if (!selectedAge) {
+          missingItems.push({label: '연령대', ref: ageSectionRef});
+        }
+        if (!selectedGender) {
+          missingItems.push({label: '성별', ref: genderSectionRef});
+        }
+        if (!selectedStyle) {
+          missingItems.push({label: '선호하는 옷 스타일', ref: styleSectionRef});
+        }
+
+        const isComplete = missingItems.length === 0;
+        const missingMessage = formatMissingMessage(missingItems.map((item) => item.label));
+
+        const handleDisabledNextAttempt = () => {
+          if (isComplete) {
+            return;
+          }
+          setNudgeActive(false);
+          requestAnimationFrame(() => {
+            setNudgeActive(true);
+          });
+          const firstMissing = missingItems[0];
+          if (firstMissing && firstMissing.ref.current) {
+            firstMissing.ref.current.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            });
+          }
+        };
+
+        const handleNextClick = () => {
+          if (!isComplete) {
+            handleDisabledNextAttempt();
+            return;
+          }
+          setCurrentStep('weather');
+          window.scrollTo({top: 0, behavior: 'auto'});
+        };
+
+        const handleBackToAbout = () => {
+          setCurrentStep('about');
+          window.scrollTo({top: 0, behavior: 'auto'});
+        };
+
+        const requestRecommendationOnce = async (locationLabel, weather) => {
+          if (isRecommendingRef.current || !selectedAge || !selectedGender || !selectedStyle) {
+            return;
+          }
+          const styleDetail = STYLE_OPTIONS.find((item) => item.id === selectedStyle);
+          if (!styleDetail) {
+            return;
+          }
+
+          isRecommendingRef.current = true;
+          setIsRecommending(true);
+          setRecommendError(false);
+          setRecommendation(null);
+
+          const variantIdx = recommendCountRef.current;
+          recommendCountRef.current += 1;
+
+          try {
+            let apiRecommendation = null;
+            const canTryServerApi =
+              window.location.protocol !== 'file:' &&
+              !window.location.hostname.endsWith('github.io');
+
+            if (canTryServerApi) {
+              try {
+                const response = await fetch('/api/recommend-outfit', {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify({
+                    age: selectedAge,
+                    gender: selectedGender,
+                    styleName: styleDetail.name,
+                    styleDescription: styleDetail.description,
+                    temperature: weather.temperature,
+                    apparentTemperature: weather.apparentTemperature,
+                    weatherLabel: weather.weatherLabel,
+                    tempMin: weather.tempMin,
+                    tempMax: weather.tempMax,
+                    precipitationProbability: weather.precipitationProbability,
+                  }),
+                });
+
+                if (response.ok) {
+                  const data = await response.json();
+                  if (data && data.recommendation) {
+                    apiRecommendation = data.recommendation;
+                  }
+                }
+              } catch {
+                // Backend not available on static hosting; fall back cleanly below.
+              }
+            }
+
+            if (apiRecommendation) {
+              setRecommendation(apiRecommendation);
+            } else {
+              await new Promise((resolve) => setTimeout(resolve, 450));
+              const localRecommendation = buildLocalOutfitRecommendation({
+                age: selectedAge,
+                gender: selectedGender,
+                styleId: selectedStyle,
+                weather,
+                variantIndex: variantIdx,
+              });
+              setRecommendation(localRecommendation);
+            }
+          } catch {
+            setRecommendError(true);
+          } finally {
+            isRecommendingRef.current = false;
+            setIsRecommending(false);
+          }
+        };
+
+        const handleProceedToRecommend = (locationLabel, weather) => {
+          setWeatherContext({locationLabel, weather});
+          setCurrentStep('recommend');
+          window.scrollTo({top: 0, behavior: 'auto'});
+          void requestRecommendationOnce(locationLabel, weather);
+        };
+
+        const handleRetryRecommend = () => {
+          if (!weatherContext) {
+            return;
+          }
+          void requestRecommendationOnce(
+            weatherContext.locationLabel,
+            weatherContext.weather,
+          );
+        };
+
+        const handleStartOver = () => {
+          if (isRecommendingRef.current) {
+            return;
+          }
+          setSelectedAge(null);
+          setSelectedGender(null);
+          setSelectedStyle(null);
+          setWeatherContext(null);
+          setRecommendation(null);
+          setRecommendError(false);
+          recommendCountRef.current = 0;
+          setCurrentStep('about');
+          window.scrollTo({top: 0, behavior: 'auto'});
+        };
+
+        if (currentStep === 'weather') {
+          return (
+            <WeatherScreen
+              onBack={handleBackToAbout}
+              onProceedToRecommend={handleProceedToRecommend}
+            />
+          );
+        }
+
+        if (currentStep === 'recommend' && weatherContext && selectedStyle) {
+          const styleDetail = STYLE_OPTIONS.find((item) => item.id === selectedStyle);
+          if (styleDetail) {
+            return (
+              <RecommendationScreen
+                styleName={styleDetail.name}
+                styleDescription={styleDetail.description}
+                styleIllustration={styleDetail.renderIllustration(true)}
+                locationLabel={weatherContext.locationLabel}
+                weather={weatherContext.weather}
+                recommendation={recommendation}
+                isLoading={isRecommending}
+                hasError={recommendError}
+                onRetryRecommend={handleRetryRecommend}
+                onStartOver={handleStartOver}
+              />
+            );
+          }
+        }
+
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-sky-100/80 via-[#F4FAFF] to-[#FFFFFF] text-[#0F2942] flex flex-col">
+            {/* Top Header */}
+            <header className="w-full border-b border-sky-200/70 bg-white/80 backdrop-blur-sm">
+              <div className="max-w-3xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between">
+                <span className="text-xl sm:text-2xl font-bold tracking-tight text-sky-700 whitespace-nowrap shrink-0">
+                  오늘 착장
+                </span>
+                <span className="text-sm sm:text-base font-medium text-sky-700/80 whitespace-nowrap shrink-0">
+                  나에 대해
+                </span>
+              </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="flex-1 w-full max-w-3xl mx-auto px-5 sm:px-8 pt-6 pb-8 sm:pt-9 sm:pb-12">
+              {/* Intro Heading */}
+              <div className="mb-8 sm:mb-10">
+                <h1 className="text-[28px] sm:text-[34px] font-bold tracking-tight text-[#0F2942] leading-tight text-balance">
+                  나에 대해
+                </h1>
+                <p className="mt-2 text-base sm:text-lg text-slate-600 leading-relaxed">
+                  편안하게 입을 수 있도록 연령대, 성별, 선호하는 스타일을 골라 주세요.
+                </p>
+              </div>
+
+              <div className="space-y-9 sm:space-y-11">
+                {/* 1. 연령대 */}
+                <section ref={ageSectionRef} aria-labelledby="age-heading">
+                  <div className="flex items-baseline justify-between gap-4 mb-4">
+                    <h2
+                      id="age-heading"
+                      className="text-xl sm:text-2xl font-bold text-[#0F2942]"
+                    >
+                      연령대
+                    </h2>
+                    <span className="text-sm sm:text-base text-sky-700 font-medium">
+                      하나만 선택
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {AGE_OPTIONS.map((age) => {
+                      const isSelected = selectedAge === age;
+                      return (
+                        <button
+                          key={age}
+                          type="button"
+                          aria-pressed={isSelected}
+                          onClick={() => setSelectedAge(age)}
+                          className={`min-h-[58px] sm:min-h-[64px] px-4 py-3 rounded-2xl text-lg sm:text-xl font-bold transition-all duration-150 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 active:scale-[0.98] whitespace-nowrap cursor-pointer ${
+                            isSelected
+                              ? 'bg-sky-600 text-white border-[3px] border-sky-700 shadow-md shadow-sky-600/20'
+                              : 'bg-white text-[#0F2942] border-2 border-sky-200 hover:border-sky-400 hover:bg-sky-50/70'
+                          }`}
+                        >
+                          {isSelected && (
+                            <Check className="w-5 h-5 shrink-0 stroke-[3]" aria-hidden="true" />
+                          )}
+                          <span>{age}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+
+                <hr className="border-sky-100" />
+
+                {/* 2. 성별 */}
+                <section ref={genderSectionRef} aria-labelledby="gender-heading">
+                  <div className="flex items-baseline justify-between gap-4 mb-4">
+                    <h2
+                      id="gender-heading"
+                      className="text-xl sm:text-2xl font-bold text-[#0F2942]"
+                    >
+                      성별
+                    </h2>
+                    <span className="text-sm sm:text-base text-sky-700 font-medium">
+                      하나만 선택
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5">
+                    {GENDER_OPTIONS.map((gender) => {
+                      const isSelected = selectedGender === gender;
+                      return (
+                        <button
+                          key={gender}
+                          type="button"
+                          aria-pressed={isSelected}
+                          onClick={() => setSelectedGender(gender)}
+                          className={`min-h-[58px] sm:min-h-[64px] px-3 sm:px-4 py-3 rounded-2xl text-base sm:text-xl font-bold transition-all duration-150 flex items-center justify-center gap-1.5 sm:gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 active:scale-[0.98] whitespace-nowrap cursor-pointer ${
+                            isSelected
+                              ? 'bg-sky-600 text-white border-[3px] border-sky-700 shadow-md shadow-sky-600/20'
+                              : 'bg-white text-[#0F2942] border-2 border-sky-200 hover:border-sky-400 hover:bg-sky-50/70'
+                          }`}
+                        >
+                          {isSelected && (
+                            <Check className="w-5 h-5 shrink-0 stroke-[3]" aria-hidden="true" />
+                          )}
+                          <span>{gender}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+
+                <hr className="border-sky-100" />
+
+                {/* 3. 선호하는 옷 스타일 */}
+                <section ref={styleSectionRef} aria-labelledby="style-heading">
+                  <div className="flex items-baseline justify-between gap-4 mb-4">
+                    <h2
+                      id="style-heading"
+                      className="text-xl sm:text-2xl font-bold text-[#0F2942]"
+                    >
+                      선호하는 옷 스타일
+                    </h2>
+                    <span className="text-sm sm:text-base text-sky-700 font-medium">
+                      하나만 선택
+                    </span>
+                  </div>
+
+                  <fieldset className="border-0 p-0 m-0">
+                    <legend className="sr-only">선호하는 옷 스타일</legend>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
+                      {STYLE_OPTIONS.map((style) => {
+                        const isSelected = selectedStyle === style.id;
+                        return (
+                          <label
+                            key={style.id}
+                            className={`group relative flex items-center gap-4 p-4 sm:p-5 rounded-3xl transition-all duration-150 cursor-pointer select-none focus-within:ring-4 focus-within:ring-sky-300 active:scale-[0.99] ${
+                              isSelected
+                                ? 'bg-sky-50 border-[3px] border-sky-600 shadow-md shadow-sky-200/70'
+                                : 'bg-white border-2 border-sky-200/90 hover:border-sky-400 hover:bg-sky-50/40'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="preferred-style"
+                              value={style.id}
+                              checked={isSelected}
+                              onChange={() => setSelectedStyle(style.id)}
+                              className="sr-only"
+                            />
+
+                            {/* Custom SVG Illustration */}
+                            <div className="w-20 h-20 sm:w-22 sm:h-22 shrink-0">
+                              {style.renderIllustration(isSelected)}
+                            </div>
+
+                            {/* Text Content */}
+                            <div className="flex-1 min-w-0">
+                              <div className="text-lg sm:text-xl font-bold text-[#0F2942] leading-snug">
+                                {style.name}
+                              </div>
+                              <p className="mt-1 text-sm sm:text-base text-slate-600 leading-snug">
+                                {style.description}
+                              </p>
+                            </div>
+
+                            {/* Large Visual Radio Indicator */}
+                            <div
+                              aria-hidden="true"
+                              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full shrink-0 flex items-center justify-center transition-colors ${
+                                isSelected
+                                  ? 'border-[3px] border-sky-600 bg-white'
+                                  : 'border-2 border-slate-300 bg-white group-hover:border-sky-400'
+                              }`}
+                            >
+                              {isSelected && (
+                                <span className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-sky-600" />
+                              )}
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                </section>
+              </div>
+            </main>
+
+            {/* Bottom Action Area */}
+            <footer className="sticky bottom-0 z-20 w-full bg-gradient-to-t from-[#F4FAFF] via-[#F4FAFF]/95 to-transparent pt-3 pb-4 px-5 sm:px-8 border-t border-sky-100/80">
+              <div className="max-w-3xl mx-auto">
+                {/* Missing field prompt */}
+                {!isComplete && (
+                  <p
+                    role="status"
+                    aria-live="polite"
+                    onAnimationEnd={() => setNudgeActive(false)}
+                    className={`mb-2.5 text-center text-base sm:text-lg font-semibold text-sky-800 ${
+                      nudgeActive ? 'animate-nudge' : ''
+                    }`}
+                  >
+                    {missingMessage}
+                  </p>
+                )}
+
+                {/* Disabled tap catcher wrapper so tapping the disabled area guides the user */}
+                <div
+                  onClick={() => {
+                    if (!isComplete) {
+                      handleDisabledNextAttempt();
+                    }
+                  }}
+                  className="w-full"
+                >
+                  <button
+                    type="button"
+                    disabled={!isComplete}
+                    aria-disabled={!isComplete}
+                    onClick={handleNextClick}
+                    className={`w-full min-h-[56px] sm:min-h-[60px] rounded-2xl text-lg sm:text-xl font-bold flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 ${
+                      isComplete
+                        ? 'bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-600/25 active:scale-[0.99] cursor-pointer'
+                        : 'bg-slate-200 text-slate-500 cursor-not-allowed pointer-events-none'
+                    }`}
+                  >
+                    <span>다음</span>
+                    <ChevronRight className="w-6 h-6 shrink-0" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </footer>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

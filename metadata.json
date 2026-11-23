@@ -1,0 +1,8 @@
+{
+  "name": "261123 오늘 착장",
+  "description": "연령대, 성별, 선호 스타일을 선택하는 오늘 착장 첫 화면",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
